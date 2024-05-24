@@ -166,7 +166,6 @@ namespace bear {
 
     rust::Result<ps::CommandPtr> Application::command(const flags::Arguments& args, const char** envp) const
     {
-        // Check if subcommand was called.
         if (args.as_string(flags::COMMAND).is_ok()) {
             if (auto citnames = cs::Citnames(log_config_); citnames.matches(args)) {
                 return citnames.subcommand(args, envp);
@@ -174,16 +173,15 @@ namespace bear {
             if (auto intercept = ic::Intercept(log_config_); intercept.matches(args)) {
                 return intercept.subcommand(args, envp);
             }
+
             return rust::Err(std::runtime_error("Invalid subcommand"));
         }
-        // If there were no subcommand, then just execute the two one after the other.
-        // TODO: execute the two process parallel like the intercept output is the citnames input.
-        //       `bear intercept -o - | bear citnames -i - -o compile_commands.json`
+
         auto commands = args.as_string(cmd::citnames::FLAG_OUTPUT)
                             .map<fs::path>([](const auto& output) {
                                 return fs::path(output).replace_extension(".events.json");
                             })
-                            .unwrap_or(fs::path(cmd::citnames::DEFAULT_OUTPUT));
+                            .unwrap_or(fs::path(cmd::intercept::DEFAULT_OUTPUT));
 
         auto environment = sys::env::from(const_cast<const char**>(envp));
         auto intercept = prepare_intercept(args, environment, commands);
@@ -196,21 +194,4 @@ namespace bear {
                 return std::make_unique<Command>(intercept, citnames, commands);
             });
     }
-
-    auto commands = args.as_string(cmd::citnames::FLAG_OUTPUT)
-                        .map<fs::path>([](const auto& output) {
-                            return fs::path(output).replace_extension(".events.json");
-                        })
-                        .unwrap_or(fs::path(cmd::intercept::DEFAULT_OUTPUT));
-
-    auto environment = sys::env::from(const_cast<const char**>(envp));
-    auto intercept = prepare_intercept(args, environment, commands);
-    auto citnames = prepare_citnames(args, environment, commands);
-
-    return rust::merge(intercept, citnames)
-        .map<ps::CommandPtr>([&commands](const auto& tuple) {
-            const auto& [intercept, citnames] = tuple;
-
-            return std::make_unique<Command>(intercept, citnames, commands);
-        });
 }
