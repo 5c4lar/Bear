@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012-2023 by László Nagy
+/*  Copyright (C) 2012-2024 by László Nagy
     This file is part of Bear.
 
     Bear is a tool to generate compilation database for clang tooling.
@@ -375,7 +375,7 @@ namespace cs::semantic {
             {"-A",                 {MatchInstruction::EXACTLY_WITH_1_OPT_GLUED_OR_SEP,  CompilerFlagType::PREPROCESSOR}},
             {"-D",                 {MatchInstruction::EXACTLY_WITH_1_OPT_GLUED_OR_SEP,  CompilerFlagType::PREPROCESSOR}},
             {"-U",                 {MatchInstruction::EXACTLY_WITH_1_OPT_GLUED_OR_SEP,  CompilerFlagType::PREPROCESSOR}},
-            {"-include",           {MatchInstruction::EXACTLY_WITH_1_OPT_SEP,           CompilerFlagType::PREPROCESSOR}},
+            {"-include",           {MatchInstruction::EXACTLY_WITH_1_OPT_GLUED_OR_SEP,  CompilerFlagType::PREPROCESSOR}},
             {"-imacros",           {MatchInstruction::EXACTLY_WITH_1_OPT_SEP,           CompilerFlagType::PREPROCESSOR}},
             {"-undef",             {MatchInstruction::EXACTLY,                          CompilerFlagType::PREPROCESSOR}},
             {"-pthread",           {MatchInstruction::EXACTLY,                          CompilerFlagType::PREPROCESSOR}},
